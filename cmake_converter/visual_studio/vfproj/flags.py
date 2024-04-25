@@ -71,6 +71,7 @@ class FortranFlags(Flags):
             ('VFFortranCompilerTool_RealKIND', self.__set_real_kind),
             ('VFFortranCompilerTool_LocalVariableStorage', self.__set_local_variable_storage),
             ('VFFortranCompilerTool_InitLocalVarToNAN', self.__set_init_local_var_to_nan),
+            ('VFFortranCompilerTool_LocalSavedScalarsZero', self.__set_init_local_var_to_zero),
             ('VFFortranCompilerTool_FloatingPointExceptionHandling',
              self.__set_floating_point_exception_handling),
             ('VFFortranCompilerTool_ExtendSinglePrecisionConstants',
@@ -659,6 +660,20 @@ class FortranFlags(Flags):
         return flag_values
 
     @staticmethod
+    def __set_init_local_var_to_zero(context, flag_name, flag_value):
+        """
+        Set init local var to Zero flag
+        """
+        del context, flag_name, flag_value
+        flag_values = {
+            'true': {ifort_cl_win: '-Qzero',
+                     ifort_cl_unix: '-zero'},
+            default_value: {}
+        }
+        return flag_values
+
+
+    @staticmethod
     def __set_preprocess_source_file(context, flag_name, flag_value):
         """
         Set preprocess source file flag
@@ -828,6 +843,8 @@ class FortranFlags(Flags):
         flag_values = {
             'localStorageAutomatic': {ifort_cl_win: '-Qauto',
                                       ifort_cl_unix: '-auto'},
+            'localStorageSave': {ifort_cl_win: '-Qsave',
+                                 ifort_cl_unix: '-save'},
             default_value: {}
         }
         return flag_values
