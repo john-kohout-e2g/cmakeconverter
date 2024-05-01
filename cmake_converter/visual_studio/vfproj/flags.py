@@ -60,6 +60,13 @@ class FortranFlags(Flags):
             ('VFFortranCompilerTool_DisableSpecificDiagnostics',
              self.__set_disable_specific_diagnostics),
             ('VFFortranCompilerTool_Diagnostics', self.__set_diagnostics),
+            ('VFFortranCompilerTool_CommonElementAlignment', self.__set_common_element_align),
+            ('VFFortranCompilerTool_ArrayAlignment', self.__set_default_array_align),
+            ('VFFortranCompilerTool_AlignSEQUENCE', self.__set_sequence_type_align),
+            ('VFFortranCompilerTool_HeapArrays', self.__set_heap_arrays),
+            ('VFFortranCompilerTool_LocalSavedScalarsZero', self.__set_local_saved_scalars_zero),
+            ('VFFortranCompilerTool_Parallelization', self.__set_parallelization),
+            ('VFFortranCompilerTool_PrefetchInsertionOpt', self.__set_prefetch_insertion_opt),
             ('VFFortranCompilerTool_WarnDeclarations', self.__set_warn_declarations),
             ('VFFortranCompilerTool_WarnUnusedVariables', self.__set_warn_unused_variables),
             ('VFFortranCompilerTool_WarnIgnoreLOC', self.__set_warn_ignore_loc),
@@ -177,7 +184,8 @@ class FortranFlags(Flags):
             ifort_ln_unix,
             'assume_args',
             'warn_args',
-            'check_args'
+            'check_args',
+            'align_args'
         ]
 
         for flag_name in self.flags_handlers:
@@ -192,6 +200,7 @@ class FortranFlags(Flags):
 
         self.__set_spec_options(context, 'assume_args', 'assume')
         self.__set_spec_options(context, 'check_args', 'check')
+        self.__set_spec_options(context, 'align_args', 'align')
         self.__set_spec_options(context, 'warn_args', 'warn')
 
     @staticmethod
@@ -264,6 +273,79 @@ class FortranFlags(Flags):
                                    ifort_cl_unix: '-warn all'},
             'diagnosticsDisableAll': {ifort_cl_win: '-warn:none',
                                       ifort_cl_unix: '-warn none'},
+            default_value: {}
+        }
+        return flag_values
+
+    @staticmethod
+    def __set_common_element_align(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'alignCommonFourBytes' : {'align_args': 'commons'},
+            'alignCommonEightBytes': {'align_args': 'dcommons'},
+            'alignCommon16Bytes': {'align_args': 'qcommons'},
+            'alignCommon32Bytes': {'align_args': 'zcommons'},
+        }
+        return flag_values
+
+    @staticmethod
+    def __set_default_array_align(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'alignArray8Bytes' : {'align_args': 'array8byte'},
+            'alignArray16Bytes': {'align_args': 'array16byte'},
+            'alignArray32Bytes': {'align_args': 'array32byte'},
+            'alignArray64Bytes': {'align_args': 'array64byte'},
+            'alignArray128Bytes': {'align_args': 'array128byte'},
+            'alignArray256Bytes': {'align_args': 'array256byte'},
+        }
+        return flag_values
+
+    @staticmethod
+    def __set_sequence_type_align(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'true': {'align_args': 'sequence'}
+        }
+        return flag_values
+
+    def __set_heap_arrays(self, context, flag_name, flag_value):
+        del context
+        # value must be a list with ',' separator
+        opt = flag_value
+        if opt:
+            self.flags[flag_name][ifort_cl_win] = ['-heap-arrays:{}'.format(opt)]
+            self.flags[flag_name][ifort_cl_unix] = ['-heap-arrays={}'.format(opt)]
+
+    @staticmethod
+    def __set_local_saved_scalars_zero(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'true': {ifort_cl_win: '-Qzero',
+                     ifort_cl_unix: '-zero'},
+            'false': {},
+            default_value: {}
+        }
+        return flag_values
+
+    @staticmethod
+    def __set_parallelization(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'true': {ifort_cl_win: '-Qparallel',
+                     ifort_cl_unix: '-parallel'},
+            'false': {},
+            default_value: {}
+        }
+        return flag_values
+
+    @staticmethod
+    def __set_prefetch_insertion_opt(context, flag_name, flag_value):
+        del context, flag_name, flag_value
+        flag_values = {
+            'prefetchMinimum': {ifort_cl_win: '-Qopt-prefetch:1', ifort_cl_unix: '-qopt-prefetch=1'},
+            'prefetchMedium': {ifort_cl_win: '-Qopt-prefetch:2', ifort_cl_unix: '-qopt-prefetch=2'},
+            'prefetchAggresive': {ifort_cl_win: '-Qopt-prefetch:3', ifort_cl_unix: '-qopt-prefetch=3'},
             default_value: {}
         }
         return flag_values

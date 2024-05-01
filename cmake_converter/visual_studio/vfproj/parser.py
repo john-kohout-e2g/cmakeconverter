@@ -80,6 +80,9 @@ class VFParser(Parser):
             'VFFortranCompilerTool_WarnUnalignedData': self.__parse_concrete_diagnostics,
             'VFFortranCompilerTool_WarnUncalled': self.__parse_concrete_diagnostics,
             'VFFortranCompilerTool_SuppressUsageMessages': self.__parse_concrete_diagnostics,
+            'VFFortranCompilerTool_CommonElementAlign': self.__parse_align_value,
+            'VFFortranCompilerTool_ArrayAlign': self.__parse_align_value,
+            'VFFortranCompilerTool_AlignSEQUENCE': self.__parse_align_value,
             'VFFortranCompilerTool_RuntimeChecks': self.__parse_runtime_checks,
             'VFFortranCompilerTool_NullPointerCheck': self.__parse_concrete_runtime_checks,
             'VFFortranCompilerTool_BoundsCheck': self.__parse_concrete_runtime_checks,
@@ -233,6 +236,9 @@ class VFParser(Parser):
 
     def __parse_concrete_runtime_checks(self, context, attr_name, attr_value, node):
         if self.common_runtime_checks_value is None:
+            context.flags.set_flag(context, attr_name, attr_value, node)
+
+    def __parse_align_value(self, context, attr_name, attr_value, node):
             context.flags.set_flag(context, attr_name, attr_value, node)
 
     def __parse_files(self, context, filter_node):

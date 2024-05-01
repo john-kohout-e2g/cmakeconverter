@@ -63,3 +63,4 @@ class VFUtils(Utils):
         context.settings[context.current_setting]['check_args'] = []
         context.settings[context.current_setting]['target_type'] = 'Application'
         context.settings[context.current_setting]['Fortran_MODULE_DIRECTORY'] = []
+        context.settings[context.current_setting]["align_args"] = []
